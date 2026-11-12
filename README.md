@@ -1,164 +1,77 @@
-# Microservice-architecture-project
-## Rest_API_Server
-## Работу выполнил студент группы К0109-23, Куликов Кирилл.
-## Преподаватель Мацуев Александр Анатольевич.
-_______________________________________________________________________________________________________________________________________________________________________
-Описание к данной работе
-REST API сервер
-Балансировщик нагрузки
-Упаковка приложения в Docker-контейнер
-Запуск проекта в Docker Compose
-1. REST API сервер
-Сервер должен принимать HTTP запросы на порт :6080 и реализовывать функционал CRUD (Create, Read, Update, Delete) по следующим конечным точкам:
+# REST API Server
 
-/api/v1/contact
-/api/v1/group
-Каждая конечная точка должна обрабатывать HTTP запросы типа POST, GET, PUT, DELETE и вызывать для них соответствующие функции Create, Read, Update, Delete для объектов Contact и Group.
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0E9F6E?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white)
 
-!!! Функционал обработки данных реализовывать не нужно !!! Все функции должны уметь просто принимать на вход структуру и возвращать в качестве ответа пустую структуру нужного типа.
+Учебный проект по микросервисной архитектуре: REST API на Python/FastAPI, контейнеризация и балансировка запросов через Nginx.
 
-(перевожу на русский язык: просто реализуем функции "заглушки")
+## Возможности
 
-Для реализации кода сервера можно использовать любой удобный для вас язык программирования.
+- CRUD-маршруты для ресурсов `contact` и `group`;
+- валидация моделей через Pydantic;
+- запуск приложения в Docker;
+- несколько экземпляров API-сервиса;
+- маршрутизация запросов через Nginx;
+- Docker Compose для воспроизводимого локального запуска.
 
-Структура объекта Contact
-type Contact struct {
-   ID int
-   Username string
-   GivenName string
-   FamilyName string
-   Phone []struct{
-      TypeID int
-      CountryCode int
-      Operator int
-      Number int
-   }
-   Email []string
-   Birthdate date
-}
-Структура объекта Group
-type Group struct {
-   ID id
-   Title string
-   Description string
-   Contacts []int
-}
-2. Балансировщик нагрузки
-В качестве балансировщика используем сервер NGINX.
+## Архитектура
 
-запросы /api/v1/contact должны распределяться между тремя запущенными контейнерами с приложением
-запросы /api/v1/group должны проксироваться в один контейнер с приложением
-Всего должны быть запущены три контейнера с приложением.
-
-3. Упаковка приложения в Docker-контейнер
-Из исходных кодов программы необходимо собрать готовые для запуска Docker контейнеры.
-
-!!! Сборка контейнеров может отличаться в зависимости от использования типа языка (интерпретируемый или компилируемый).
-
-4. Запуск проекта в Docker Compose
-В проекте Docker Compose необходимо запустить сервис с настроенным балансировщиком NGINX и три экземпляра сервиса с контейнером приложения.
-_______________________________________________________________________________________________________________________________________________________________________
-# RestAPI-server
-![Static Badge](https://img.shields.io/badge/Python-3.12-green?style=flat-square&logo=Python&logoColor=yellow&label=Python&labelColor=%23000000%09)
-![Static Badge](https://img.shields.io/badge/Docker-blue?style=flat-square&logo=DOCKER&logoColor=white)
-![Static Badge](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white&style=flat-square)
-![Static Badge](https://img.shields.io/badge/FastAPI-000000?style=flat-square&logo=FastAPI&logoColor=white)
-
----
-## Описание
-Rest API сервер написанный на Python с использованием FastAPI. 
-Проект был разработан в качестве лабораторной работы по дисциплине "Микросервисная архитектура" студентом 2 курса специальности 09.02.01 "Компьютерные системы и комплексы".
-
-## Используемые технологии
-* `python 3.12`
-* `docker`
-* `nginx`
-* `fastapi`
-* `uvicorn`
-* `pydantic`
-
-## Инструкция по запуску
-### Запуск с использованием Docker
-**Пересобираете и запускаете контейнеры с помощью команды:**
-```bash
-docker-compose up --build
+```text
+HTTP client
+    │
+    ▼
+Nginx load balancer
+    ├── API replica 1
+    ├── API replica 2
+    └── API replica 3
 ```
-**После у вас появится 5 контейнеров:**
-* 4 экземляра сервиса
-* Балансировщик nginx
 
-**Сделайте запрос через Nginx или вставьте URL-адрес страницы**
+Маршруты `/api/v1/contact` распределяются между экземплярами API, а `/api/v1/group` направляются в отдельный upstream согласно конфигурации Nginx.
+
+## Стек
+
+- Python 3.12
+- FastAPI, Uvicorn, Pydantic
+- Docker и Docker Compose
+- Nginx
+- REST API, HTTP, JSON
+
+## Запуск
+
+Требуется Docker Desktop или Docker Engine с Compose.
+
+```bash
+docker compose up --build
+```
+
+После запуска API доступен через Nginx:
+
 ```bash
 curl http://localhost/api/v1/contact/
 ```
 
-### Запуск без Docker-a
-**Запустите главный скрипт "main.py" и перейдите по ссылке:** `http://127.0.0.1:6080`
-В открывшейся странице выберите одну из предложенный ссылок:
-![image](https://github.com/user-attachments/assets/9f4659dc-9027-48c0-ad29-b83b1f243418)
+Документация FastAPI:
 
-**Откройте один из файлов** `cmd/contact.py` **или** `cmd/group.py`
-В самом конце кода будет написано основное тело запроса. Можете убрать коментарии и наблюдать за изменениями на странице или в консоли VS Code.
+- `http://localhost/docs`
+- `http://localhost/redoc`
 
-## Структура проекта
+## Структура
+
+```text
+.
+├── app/                 # модели и общие компоненты
+├── cmd/                 # точка входа и API-роутеры
+├── nginx/               # Dockerfile и конфигурация балансировщика
+├── templates/           # простая web-страница проекта
+├── compose.yaml
+├── Dockerfile
+└── requirements.txt
 ```
-C:.
-│   .env
-│   compose.yaml
-│   Dockerfile
-│   README.md
-│   requirements.txt
-│   
-├───app
-│   │   models.py
-│   │   __init__.py
-│   │
-│   └───__pycache__
-│           __init__.cpython-312.pyc
-│           __init__.cpython-313.pyc
-│
-├───cmd
-│   │   main.py
-│   │   __init__.py
-│   │
-│   ├───routers
-│   │   │   contact.py
-│   │   │   group.py
-│   │   │   __init__.py
-│   │   │
-│   │   └───__pycache__
-│   │           __init__.cpython-313.pyc
-│   │
-│   └───__pycache__
-│           main.cpython-313.pyc
-│           __init__.cpython-313.pyc
-│
-├───nginx
-│       Dockerfile
-│       nginx.conf
-│
-└───templates
-        index.html
-```
-______________________________________________________________________________________________________________________________________________________________________
-## Используемые инструменты
-* `Python 3.12-slim`
-* `HTML`
-* `FastAPI`
-* `Uvicorn`
-* `Pydantic`
-* `Docker`
-* `DockerHUB`
-* `Pygame`
-* `Visual Studio Code`
-_______________________________________________________________________________________________________________________________________________________________________
-## Документация к работе
-* `Вся структура работы в ветке master.`
-* `Основной код находится в файле main.py.`
-_______________________________________________________________________________________________________________________________________________________________________
-## Личные ссылки
-* `sma1kyyy001@gmail.com - mail.` 
-* `sma1kyyy - telegramm.`
-_______________________________________________________________________________________________________________________________________________________________________
-## Дальнейшая модернизация
-* `Планирую доработать данный проект до идеала не из побуждения для сдачи проекта по предмету, а из личных соображений и принципов. Хочу доработать управление, графику и сам интерфейс.`
+
+## Что демонстрирует проект
+
+Проект показывает базовые практики backend-разработки и эксплуатации сервисов: разделение ответственности, API-контракты, контейнеризацию, горизонтальное масштабирование и reverse proxy.
+
+Автор: [Кирилл Куликов](https://github.com/sma1kyyy)
